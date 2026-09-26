@@ -1,0 +1,18 @@
+flowchart LR
+  W[Workspace] -->|CONTAINS| P[Project]
+  W -->|CONTAINS| T[Task]
+  W -->|CONTAINS| C[Client]
+  W -->|CONTAINS| R[Partner]
+  W -->|CONTAINS| H[Person]
+  W -->|CONTAINS| D[Document]
+  P -->|HAS_TASK| T
+  P -->|FOR_CLIENT| C
+  P -->|WITH_PARTNER| R
+  H -->|ASSIGNED_TO| T
+  H -->|PARTICIPATES_IN| P
+  D -->|RELATES_TO, provenance + review state| P
+  D -->|RELATES_TO, provenance + review state| T
+  D -->|RELATES_TO, provenance + review state| C
+  D -->|RELATES_TO, provenance + review state| R
+  D -->|RELATES_TO, provenance + review state| H
+  D -->|HAS_CHUNK| X[DocumentChunk: text, line locator, embedding metadata]

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "neo4j-agent-memory"
+version = "0.1.0"
+description = "Permission-scoped project memory and retrieval over Neo4j"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "neo4j>=5.26",
+  "mcp>=1.12",
+  "openai>=1.99",
+]
+
+[project.scripts]
+neo4j-agent-memory = "neo4j_agent_memory.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/neo4j_agent_memory"]

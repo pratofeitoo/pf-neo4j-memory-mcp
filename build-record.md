@@ -140,3 +140,9 @@ Proceed with Phase 0 scope decisions and Phase 1 source/license/code audit in [i
 - Through a local MCP stdio client, initialized the protocol session and called four tools against `codex-mem-01`: `initialize_memory_schema`, `upsert_memory_entity`, `link_memory_entities`, and `get_task_context`.
 - All four returned successfully. Upsert/link used existing fictional Orion demo records and the already-existing `HAS_TASK` edge; this refreshed metadata timestamps but added no records or new relationships. Schema initialization reported existing constraints/indexes as no-ops.
 - `get_task_context` returned the synthetic blocked task with one project, assignee, and linked document; Neo4j temporal values serialized as strings. No hosted embedding or real-data tool call was made.
+
+## 2026-09-26 — Add the Codex memory-usage skill
+
+- Added project-local `.agents/skills/neo4j-agent-memory/` with Codex skill metadata and operating guidance for choosing the six MCP tools, grounding answers in returned source metadata, and respecting explicit-write authorization, synthetic-only limits, and hosted-embedding disclosure.
+- Linked the skill from the README document map and implementation-slice description. No MCP calls, database changes, global Codex configuration changes, or real-data ingestion were performed.
+- Validation: `quick_validate.py .agents/skills/neo4j-agent-memory` reported `Skill is valid!`; `git diff --check` passed.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Neo4j Agent Memory"
+  short_description: "Use scoped Neo4j memory tools in Codex"
+  default_prompt: "Use $neo4j-agent-memory to retrieve or update relevant memory for this task."

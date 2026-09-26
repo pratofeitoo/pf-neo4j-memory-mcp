@@ -18,6 +18,7 @@ The first implementation should favor a small, coherent core: domain schema, pro
 
 ## Document map
 
+- [Codex skill](.agents/skills/neo4j-agent-memory/SKILL.md) — when and how to use the bundled memory tools, with source, authorization, and synthetic-data safeguards.
 - [Architecture and design](architecture.md) — goals, boundaries, proposed components, graph model, retrieval, tools, security, decisions, and open questions.
 - [Step-by-step implementation plan](implementation-plan.md) — ordered phases, deliverables, acceptance criteria, dependencies, and verification gates.
 - [Build record](build-record.md) — append-only evidence of what was implemented, changed, tested, and deferred. Planned work must not be reported as completed here.
@@ -28,7 +29,7 @@ The first implementation should favor a small, coherent core: domain schema, pro
 
 ## Current implementation slice
 
-The `src/neo4j_agent_memory/` package contains a local MCP server, scoped Neo4j store, entity/link operations, plain text and Markdown ingestion, OpenAI embeddings behind a provider interface, indexed semantic chunk retrieval with a workspace prefilter, and structured task context lookup. The server is configured for one local Codex user and one configured workspace. It does not yet provide multi-user authorization, document version history, retention/deletion workflows, source-system synchronization, or production operations.
+The `src/neo4j_agent_memory/` package contains a local MCP server, scoped Neo4j store, entity/link operations, plain text and Markdown ingestion, OpenAI embeddings behind a provider interface, indexed semantic chunk retrieval with a workspace prefilter, and structured task context lookup. The project-local Codex skill in `.agents/skills/neo4j-agent-memory/` guides agents using these tools. The server is configured for one local Codex user and one configured workspace. It does not yet provide multi-user authorization, document version history, retention/deletion workflows, source-system synchronization, or production operations.
 
 The default embedding model is `text-embedding-3-small` (1536 dimensions). The client is only created when an embedding call is made; initialization and schema creation do not call the embedding provider. Never put an API key in checked-in files. The synthetic demo uses a deterministic feature-hash vector solely to populate and exercise the local retrieval path; its ranking is not a semantic-quality measure and its vectors are tagged with a different model name.
 

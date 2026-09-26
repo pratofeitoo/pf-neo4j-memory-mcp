@@ -125,3 +125,18 @@ Proceed with Phase 0 scope decisions and Phase 1 source/license/code audit in [i
 - Initialized package schema in `codex-mem-01` (9 constraints, 13 indexes), then copied the fixture's 12 nodes and 24 relationships, preserving properties and embedding vectors. The source database was not modified.
 - Read-only comparison after copying confirmed matching per-label counts and per-relationship counts in source and target. A target lookup returned synthetic task `demo-task-identity` with status `blocked`.
 - Project configuration defaults remain `codex-mem-01` in the MCP server, synthetic seed, and `.env.example`; environment variable `NEO4J_DATABASE` can override it. No real data, hosted embedding call, or Codex MCP handshake was involved.
+
+## 2026-09-25 — Enable and connect the local Codex MCP server
+
+- Added and enabled global Codex MCP server `neo4j-agent-memory` using the supported stdio configuration. It launches the project package against loopback Neo4j, database `codex-mem-01`, workspace `local-development`.
+- Stored the supplied Neo4j credential in macOS login Keychain under service `codex.neo4j-agent-memory` / account `neo4j`; the Codex config invokes `security` to retrieve it at launch. No credential is stored in the repo or Codex TOML.
+- Installed project dependencies into ignored `.venv`. The first launch exposed that the broad `mcp>=1.12` dependency resolved to incompatible MCP SDK 2.x; constrained the project to `mcp>=1.12,<2` and synced the environment.
+- MCP initialize and list-tools handshake succeeded (six tools discovered). Read-only `get_task_context` reached `codex-mem-01` but first exposed Neo4j temporal serialization failures; MCP responses for task context now recursively convert Neo4j temporal values to JSON-safe strings.
+- Repeated the handshake and tool call successfully: `get_task_context("demo-task-identity")` returned status `blocked`, one linked project, one assignee, and one document; no write tool or embedding endpoint was called.
+- Current Codex configuration reports `enabled=true`. A new Codex task/session may be needed for the already-running desktop session to refresh its MCP inventory. Hosted embeddings and real-data use remain unverified/deferred.
+
+## 2026-09-25 — Exercise MCP tool calls
+
+- Through a local MCP stdio client, initialized the protocol session and called four tools against `codex-mem-01`: `initialize_memory_schema`, `upsert_memory_entity`, `link_memory_entities`, and `get_task_context`.
+- All four returned successfully. Upsert/link used existing fictional Orion demo records and the already-existing `HAS_TASK` edge; this refreshed metadata timestamps but added no records or new relationships. Schema initialization reported existing constraints/indexes as no-ops.
+- `get_task_context` returned the synthetic blocked task with one project, assignee, and linked document; Neo4j temporal values serialized as strings. No hosted embedding or real-data tool call was made.

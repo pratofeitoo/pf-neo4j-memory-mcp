@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import ipaddress
+from collections.abc import Mapping
 from urllib.parse import urlsplit
 from typing import Any
 
@@ -12,6 +13,16 @@ from .embedding import OpenAIEmbeddingProvider
 from .models import DocumentInput, EntityInput, EntityRef, Scope
 from .service import MemoryService
 from .store import Neo4jStore
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if value.__class__.__module__.startswith("neo4j.time"):
+        return value.iso_format() if hasattr(value, "iso_format") else str(value)
+    return value
 
 
 def create_service() -> tuple[MemoryService, Any]:
@@ -132,7 +143,7 @@ def build_mcp(service: MemoryService) -> FastMCP:
     @mcp.tool()
     def get_task_context(task_id: str) -> dict[str, Any] | None:
         """Return structured task state, project, assignees, and linked documents."""
-        return service.get_task_context(task_id)
+        return _json_safe(service.get_task_context(task_id))
 
     return mcp
 

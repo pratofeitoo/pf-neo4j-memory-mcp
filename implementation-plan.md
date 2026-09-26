@@ -85,7 +85,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 3 — Build the local development foundation
 
-**Current status:** Python package layout, dependency manifest, environment example, and local MCP entrypoint created. The provided Neo4j 2026.09.0 Enterprise instance is reachable; package constraints and indexes were initialized. MCP installation/handshake remains unverified.
+**Current status:** Python package layout, dependency manifest, environment example, and local MCP entrypoint created. The provided Neo4j 2026.09.0 Enterprise instance is reachable; package constraints and indexes were initialized. The local Codex MCP entry is enabled and an initialize/tool-list handshake has succeeded.
 
 ### Work
 
@@ -194,7 +194,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 7 — Expose secure MCP tools
 
-**Current status:** Local stdio MCP tools are implemented for initialization, entity upsert, typed links, text ingestion, semantic search, and task context. No MCP handshake, transport, or authorization test has been run; multi-user and network use are unsupported.
+**Current status:** Local stdio MCP tools are implemented for initialization, entity upsert, typed links, text ingestion, semantic search, and task context. The stdio handshake, tool discovery, and one read-only task-context call succeeded through the Keychain-backed Codex launch configuration. No multi-user or network use is supported.
 
 ### Work
 

@@ -5,9 +5,17 @@
 **Handoff status:** Active implementation handoff
 **Current project status:** Local synthetic vertical slice implemented and exercised against the user's Neo4j instance; later integration and readiness gates remain open.
 
+## Codex MCP activation update — 2026-09-25
+
+- The global Codex MCP entry `neo4j-agent-memory` is enabled and configured for local stdio, `neo4j://127.0.0.1:7687`, database `codex-mem-01`, and workspace `local-development`.
+- The Neo4j password is stored in macOS login Keychain under service `codex.neo4j-agent-memory`, account `neo4j`; it is not present in the global TOML or repository. Codex retrieves it when starting the MCP process.
+- Codex initialize and tool-list handshake succeeded; all six tools were discovered. A read-only `get_task_context` call returned the synthetic blocked task and its linked project/person/document.
+- The dependency now pins `mcp>=1.12,<2` because the server uses v1 FastMCP API. Task context MCP output now normalizes Neo4j temporal values to JSON-safe strings.
+- The already-running Codex app may need a new task/session to refresh its tool inventory. Hosted embeddings remain unconfigured/unverified; no real data is approved.
+
 ## Continuation update — 2026-09-25
 
-The initial assignment below records the pre-implementation state and is retained as history. Its statement that implementation has not started and its request to gather Phase 0 decisions are superseded by this update and the dated evidence in `build-record.md`.
+The initial assignment below records the pre-implementation state and is retained as history. Its statement that implementation has not started and its request to gather Phase 0 decisions are superseded by the dated updates and evidence in `build-record.md`.
 
 - User decisions: Codex only for now; local deployment; latest Neo4j with APOC and GDS available; source details supplied directly as needed; hosted embeddings allowed; mostly text files; retention/privacy deferred.
 - The user supplied the local Neo4j Desktop data-directory context and loopback Bolt URI. Credentials are not stored in project files.

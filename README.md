@@ -1,7 +1,7 @@
 # Neo4j Agent Memory Package
 
 **Documentation status:** Design and implementation in progress
-**Implementation status:** Local synthetic vertical slice exercised against Neo4j; Codex MCP handshake and hosted embeddings not verified
+**Implementation status:** Codex stdio MCP enabled and handshake/tool lookup verified against local synthetic data; hosted embeddings not verified
 **Last reviewed:** 2026-09-25
 
 This directory is the durable project record for designing and building an agent-memory package around Neo4j. It is both a practical implementation plan and the place to record the decisions, evidence, and changes that explain how the delivered solution was built.
@@ -42,7 +42,7 @@ The default embedding model is `text-embedding-3-small` (1536 dimensions). The c
 
 To load the repeatable fictional dataset into `local-development`, run `PYTHONPATH=src python examples/seed_synthetic_demo.py` after dependencies are installed. It uses a local-only deterministic fixture embedder and does not call OpenAI.
 
-The configured Neo4j instance was inventoried read-only as Enterprise `2026.09.0`, with APOC and GDS present and zero graph nodes before setup. Package constraints and indexes were initialized there, and the repeatable synthetic seed was exercised with indexed retrieval and structured task-context lookup. The workspace now contains fictional demo data only. No embedding API or MCP handshake has been run. The local Docker daemon was unavailable during implementation. Retention/privacy policy is explicitly deferred; keep all data synthetic until that work is completed.
+The configured Neo4j instance was inventoried read-only as Enterprise `2026.09.0`, with APOC and GDS present and zero graph nodes before setup. Package constraints and indexes were initialized in `codex-mem-01`, which now contains only the cloned fictional demo graph. The local stdio MCP server is enabled in Codex; its initialize/tool-list handshake and read-only synthetic task lookup succeeded. No embedding API request has been made. The local Docker daemon was unavailable during implementation. Retention/privacy policy is explicitly deferred; keep all data synthetic until that work is completed.
 
 ## Source repositories and technical references
 

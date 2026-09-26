@@ -240,7 +240,7 @@ Do not describe the system as “smooth” or production-ready based on a succes
 2. The user will provide source systems and workflows as needed. Connector direction, source-of-truth rules, conflict handling, and write-back permissions remain unselected.
 3. Hosted embeddings are permitted, but the provider/model choice is not confirmed as a product decision. The optional OpenAI adapter and `text-embedding-3-small` default are implementation defaults only; no hosted request has been made.
 4. Initial content is mostly text files; only plain text and Markdown are implemented. Volumes, languages, update rates, and other formats remain open.
-5. Local Codex is the first client and one configured workspace is the current boundary. Codex registration/handshake is not yet verified; shared access, authenticated multi-user identity, and project-level permissions are unsupported.
+5. Local Codex is the first client and one configured workspace is the current boundary. The global Codex stdio entry is enabled and its handshake/tool lookup has been verified; shared access, authenticated multi-user identity, and project-level permissions are unsupported.
 6. Document revision history, retention automation, source synchronization, and migration/backup operations are future design gates.
 
 Continue synthetic-only implementation for reversible work. Do not treat these deferred items as approved for production or real-data use.

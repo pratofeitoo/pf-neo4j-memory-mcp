@@ -55,7 +55,7 @@ class MemoryService:
                     "ordinal": ordinal,
                     "text": text,
                     "locator": locator,
-                    "embedding": self.embedding_provider.embed(text),
+                    "embedding": self.embedding_provider.embed_document(text),
                     "embedding_model": self.embedding_provider.model,
                     "embedding_dimensions": self.embedding_provider.dimensions,
                 }
@@ -69,7 +69,7 @@ class MemoryService:
             raise ValueError("query must not be empty")
         if not 1 <= limit <= 20:
             raise ValueError("limit must be between 1 and 20")
-        vector = self.embedding_provider.embed(query)
+        vector = self.embedding_provider.embed_query(query)
         return self.store.search_chunks(
             self.scope, vector, self.embedding_provider.model, limit
         )

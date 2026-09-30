@@ -9,7 +9,7 @@ from typing import Any
 from neo4j import GraphDatabase
 from mcp.server.fastmcp import FastMCP
 
-from .embedding import OpenAIEmbeddingProvider
+from .embedding import OllamaEmbeddingProvider, OpenAIEmbeddingProvider
 from .models import DocumentInput, EntityInput, EntityRef, Scope
 from .service import MemoryService
 from .store import Neo4jStore, ALLOWED_LABELS
@@ -40,13 +40,26 @@ def create_service() -> tuple[MemoryService, Any]:
     ):
         raise RuntimeError("This initial server only supports a loopback Neo4j URI")
 
-    dimensions = int(os.environ.get("MEMORY_EMBEDDING_DIMENSIONS", "1536"))
+    provider_name = os.environ.get("MEMORY_EMBEDDING_PROVIDER", "ollama").lower()
+    default_dimensions = "768" if provider_name == "ollama" else "1536"
+    dimensions = int(os.environ.get("MEMORY_EMBEDDING_DIMENSIONS", default_dimensions))
     if not 1 <= dimensions <= 4096:
         raise RuntimeError("MEMORY_EMBEDDING_DIMENSIONS must be between 1 and 4096")
-    model = os.environ.get("MEMORY_EMBEDDING_MODEL", "text-embedding-3-small")
+    default_model = "nomic-embed-text:latest" if provider_name == "ollama" else "text-embedding-3-small"
+    model = os.environ.get("MEMORY_EMBEDDING_MODEL", default_model)
+    if provider_name == "ollama":
+        provider = OllamaEmbeddingProvider(
+            model, dimensions,
+            os.environ.get("MEMORY_OLLAMA_URL", "http://127.0.0.1:11434"),
+            os.environ.get("MEMORY_OLLAMA_MODEL_DIGEST", ""),
+        )
+    elif provider_name == "openai":
+        provider = OpenAIEmbeddingProvider(model, dimensions)
+    else:
+        raise RuntimeError("MEMORY_EMBEDDING_PROVIDER must be ollama or openai")
     driver = GraphDatabase.driver(uri, auth=(username, password))
     store = Neo4jStore(driver, database, dimensions)
-    service = MemoryService(store, OpenAIEmbeddingProvider(model, dimensions), Scope(workspace_id))
+    service = MemoryService(store, provider, Scope(workspace_id))
     return service, driver
 
 

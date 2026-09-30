@@ -137,7 +137,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 5 — Implement document ingestion and embedding lifecycle
 
-**Current status:** Initial plain text/Markdown chunking, stable IDs, checksums, locators, embedding metadata, and hosted provider adapter are implemented. A local synthetic feature-hash fixture was stored and retrieved. No hosted embedding request has been made. Changed-content history, robust jobs/retries, and deletion/retention remain open.
+**Current status:** Initial plain text/Markdown chunking, stable IDs, checksums, locators, embedding metadata, and both local Ollama and optional hosted adapters are implemented. The Ollama model and 768-dimensional vector index passed a synthetic end-to-end check. The approved pilot snapshot now has 66 derived indexed documents and 66 chunks, each linked to its original source entity; a private pre-write export was saved. Changed-content history, robust jobs/retries, and deletion/retention remain open.
 
 ### Work
 
@@ -165,7 +165,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 6 — Build retrieval and context assembly
 
-**Current status:** Cypher 25 `SEARCH` with the workspace as an in-index filter, citations/linked-entity metadata, and structured task context lookup were exercised with the synthetic fixture. Query plans and retrieval quality are not evaluated on representative data.
+**Current status:** Cypher 25 `SEARCH` with the workspace as an in-index filter, citations/linked-entity metadata, and structured task context lookup were exercised with synthetic and real pilot data. Portuguese and English pilot queries retrieved the expected linked task first through MCP. Query plans and broader retrieval quality are not evaluated on a representative question set.
 
 ### Work
 
@@ -194,7 +194,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 7 — Expose secure MCP tools
 
-**Current status:** Local stdio MCP tools are implemented for initialization, entity upsert, typed links, text ingestion, semantic search, and task context. The stdio handshake, tool discovery, and one read-only task-context call succeeded through the Keychain-backed Codex launch configuration. No multi-user or network use is supported.
+**Current status:** Local stdio MCP tools are implemented for initialization, entity upsert, typed links, text ingestion, semantic search, and task context. The Keychain-backed Codex launch configuration completed a handshake, tool discovery, semantic searches over the indexed pilot, and task-context retrieval including its derived document. No multi-user or network use is supported.
 
 ### Work
 

@@ -8,7 +8,7 @@ from .models import DocumentInput, EntityInput, EntityRef, Scope
 
 COMPATIBILITY_LABELS = {"Setor": "Project", "Team": "Person", "Subtask": "Task"}
 ALLOWED_LABELS = {"Project", "Setor", "Task", "Subtask", "Client", "Partner", "Person", "Team", "Meeting", "Document"}
-ALLOWED_LINK_TYPES = ALLOWED_LABELS - {"Document"}
+ALLOWED_LINK_TYPES = ALLOWED_LABELS
 ALLOWED_PROPERTIES = {
     "Project": {"status", "summary", "start_at", "due_at"},
     "Task": {"status", "priority", "description", "updates", "drive_folder_url", "due_at", "completed_at", "complete", "date", "source_option_id", "attachment_metadata"},
@@ -80,6 +80,17 @@ class Neo4jStore:
             "`vector.similarity_function`: 'cosine'}}"
         )
         with self.driver.session(database=self.database) as session:
+            existing = session.run(
+                "SHOW VECTOR INDEXES YIELD name, options WHERE name = 'memory_chunk_embedding' "
+                "RETURN options"
+            ).single()
+            if existing:
+                configured = existing["options"].get("indexConfig", {}).get("vector.dimensions")
+                if configured != self.embedding_dimensions:
+                    raise RuntimeError(
+                        f"memory_chunk_embedding has {configured} dimensions, but the configured "
+                        f"provider requires {self.embedding_dimensions}; run the reviewed index migration"
+                    )
             for statement in statements:
                 session.run(statement).consume()
             session.run(vector_statement).consume()
@@ -177,14 +188,15 @@ class Neo4jStore:
                 source_system=document.source_system,
                 source_id=document.source_id,
             ).single()
-            if existing and existing["properties"].get("checksum") != content_checksum:
-                tx.run(
-                    "MATCH (d:Document {workspace_id:$workspace_id, id:$document_id}) "
-                    "OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:DocumentChunk) DETACH DELETE c",
-                    workspace_id=scope.workspace_id,
-                    document_id=existing["id"],
-                ).consume()
+            if existing:
                 document_id = existing["id"]
+                if existing["properties"].get("checksum") != content_checksum:
+                    tx.run(
+                        "MATCH (d:Document {workspace_id:$workspace_id, id:$document_id}) "
+                        "OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:DocumentChunk) DETACH DELETE c",
+                        workspace_id=scope.workspace_id,
+                        document_id=document_id,
+                    ).consume()
             tx.run(
                 "MERGE (w:Workspace {id:$workspace_id}) ON CREATE SET w.created_at=datetime() "
                 "MERGE (d:Document {workspace_id:$workspace_id, id:$document_id}) "

@@ -21,7 +21,7 @@ Every node written by the package is keyed and queried by `workspace_id`. The fi
 | `Document` | `workspace_id`, `id`, `title`, `status`, `notes`, `attachment_metadata`, source identity, `updated_at` | `source_uri`, `mime_type`, `checksum` | `(workspace_id, id)` unique; source tuple identifies repeat ingestion |
 | `DocumentChunk` | `workspace_id`, `id`, `ordinal`, `text`, `locator`, `embedding`, `embedding_model`, `embedding_dimensions`, `updated_at` | — | `(workspace_id, id)` unique |
 
-All entity labels support source-table provenance fields from the mapping document. The current Airtable snapshot populates Meeting and Document properties from structured source rows. Document text chunks/embeddings are still created only by explicit text ingestion. Document metadata fields include title/status/notes/attachment metadata/source URI/MIME type. Schema support for a property does not imply that its source content was imported.
+All entity labels support source-table provenance fields from the mapping document. The current Airtable snapshot populates Meeting and Document properties from structured source rows. A separate, explicit local indexing run created derived `Document` nodes (`source_system=airtable-text-index-v1`) for current Setor, Task, Subtask, Meeting, and Document record text. Each derived node uses the Airtable record ID as `source_id`, a stable source locator, and a `RELATES_TO` link to its original entity. Document metadata fields include title/status/notes/attachment metadata/source URI/MIME type. Attachment content was not imported.
 
 ## Relationships
 
@@ -36,7 +36,7 @@ All entity labels support source-table provenance fields from the mapping docume
 | `ASSIGNED_TO` | Person → Task | Task assignment; same link metadata. Airtable collaborator display names are preserved in the matched Person's `aliases`; source collaborator IDs are stored on imported relationship metadata. |
 | `PARTICIPATES_IN` | Person → Project | Project participation; same link metadata |
 | `LEADS` | Person → Project | Explicit project leadership, distinct from general participation; same link metadata |
-| `RELATES_TO` | Document → Project/Task/Client/Partner/Person | Explicit document association; provenance and review state are recorded |
+| `RELATES_TO` | Document → Project/Task/Client/Partner/Person/Meeting/Document | Explicit document association; provenance and review state are recorded |
 | `HAS_CHUNK` | Document → DocumentChunk | Document text split into cited chunks |
 
 Allowed link provenance values are `USER_LINKED`, `IMPORTED`, and `EXTRACTED`. Review state values are `USER_LINKED`, `IMPORTED`, `PROPOSED`, and `REVIEWED`. Extracted links should normally start as `PROPOSED`; current tools do not run automatic entity extraction.
@@ -44,7 +44,7 @@ Allowed link provenance values are `USER_LINKED`, `IMPORTED`, and `EXTRACTED`. R
 ## Identity, history, and limitations
 
 - Project/entity IDs are supplied by the caller and must be stable within a workspace. Source system and source ID are stored separately for lineage.
-- Document IDs are deterministic UUIDv5 values from workspace, source system, and source ID. Chunk IDs also include ordinal and chunk text digest.
+- Derived ingestion Document IDs are deterministic UUIDv5 values from workspace, source system, and source ID; pre-existing Airtable Document entities keep their Airtable record IDs. Chunk IDs include ordinal and chunk text digest.
 - Re-ingestion with identical document source/content keeps stable identities. Changed content replaces chunks for that document. The current implementation does not preserve old document versions.
 - Current upserts replace the supported entity properties. The current slice has no `Claim` node, general event log, alias-resolution/merge model, `valid_from`/`valid_to` history, retention job, or multi-user permission model.
 - Task state is stored as a property and returned by a structured Cypher query. Historical state is not retained in this first slice.

@@ -33,6 +33,12 @@ class SyntheticHashEmbeddings:
         norm = math.sqrt(sum(value * value for value in vector))
         return [value / norm for value in vector] if norm else vector
 
+    def embed_document(self, text: str) -> list[float]:
+        return self.embed(text)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self.embed(text)
+
 
 def main() -> None:
     password = os.environ.get("NEO4J_PASSWORD")

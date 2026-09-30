@@ -7,7 +7,7 @@ from typing import Any
 from .chunking import checksum, chunk_text
 from .embedding import EmbeddingProvider
 from .models import DocumentInput, EntityInput, Scope
-from .store import Neo4jStore
+from .store import Neo4jStore, ALLOWED_LINK_TYPES
 
 _NAMESPACE = uuid.UUID("3a21dd3c-bf20-4bbb-91cf-1096a41baf0e")
 _ALLOWED_MIME_TYPES = {"text/plain", "text/markdown"}
@@ -38,7 +38,7 @@ class MemoryService:
             raise ValueError("Unsupported link provenance")
         if item.link_review_state not in _ALLOWED_LINK_REVIEW_STATES:
             raise ValueError("Unsupported link review state")
-        if any(ref.entity_type not in {"Project", "Task", "Client", "Partner", "Person"} for ref in item.linked_entities):
+        if any(ref.entity_type not in ALLOWED_LINK_TYPES for ref in item.linked_entities):
             raise ValueError("Unsupported linked entity type")
 
         source_key = f"{self.scope.workspace_id}:{item.source_system}:{item.source_id}"

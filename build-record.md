@@ -146,3 +146,63 @@ Proceed with Phase 0 scope decisions and Phase 1 source/license/code audit in [i
 - Added project-local `.agents/skills/neo4j-agent-memory/` with Codex skill metadata and operating guidance for choosing the six MCP tools, grounding answers in returned source metadata, and respecting explicit-write authorization, synthetic-only limits, and hosted-embedding disclosure.
 - Linked the skill from the README document map and implementation-slice description. No MCP calls, database changes, global Codex configuration changes, or real-data ingestion were performed.
 - Validation: `quick_validate.py .agents/skills/neo4j-agent-memory` reported `Skill is valid!`; `git diff --check` passed.
+
+## 2026-09-26 — Scope a separate real-data pilot
+
+- User selected database `neo4j` on the existing local Neo4j instance as the separate pilot database; `codex-mem-01` remains outside the pilot target.
+- Read-only inspection confirmed `neo4j` is reachable and currently contains the synthetic fixture (12 nodes, 24 relationships; all 10 nodes with source metadata use `synthetic-demo`). No database records were changed or removed.
+- Added [real-data-pilot.md](real-data-pilot.md) to record the selected database, observed synthetic state, proposed workspace isolation, and unresolved gates for data categories, access, retention/deletion, audit/provenance, source identity, embeddings, and recovery.
+- No pilot workspace/configuration was created or changed, no real data was ingested, and no embedding request was made. A distinct server-configured workspace and an approved data sample remain prerequisites.
+
+## 2026-09-26 — Clear the selected pilot database
+
+- User explicitly requested clearing database `neo4j` on the existing local instance. A read-only preflight confirmed its only workspace was `local-development`, all 10 records with `source_system` were `synthetic-demo`, and the graph contained 12 nodes and 24 relationships; no other sourced records were present.
+- Deleted all 12 nodes and 24 relationships from `neo4j`. Post-clear verification returned zero nodes and zero relationships. Preserved all nine constraints and all 11 package indexes (all online).
+- Did not modify `codex-mem-01`, schema/index definitions, MCP configuration, or embedding settings. No real data was added and no embedding request was made.
+
+## 2026-09-26 — Inventory Airtable pilot source (read-only)
+
+- User selected the Airtable `Project Management` base and Tasks, Projects, and Users data. The corresponding Airtable tables are Tasks (13 records), Projects (8), and People (3; Airtable's table name for Users).
+- Fetched a narrow read-only projection: task names/status/project and subtask links; project names/status/task, team, and lead links; person names/roles/project membership and leadership links. Omitted People email, bio, photo, and Slack URL fields. Did not fetch the Tasks collaborator field, which may expose collaborator identity details.
+- No Airtable records were modified; no records were written to Neo4j, and no embedding request was made.
+- Mapping review found that the existing Neo4j package can represent project-task membership and generic participation, but not a distinct project-lead relationship. That relationship and task collaborator mapping need a decision before import.
+
+## 2026-09-26 — Implement and verify the bounded Airtable pilot
+
+- User approved adding the required graph mappings and importing selected Airtable fields into database `neo4j`, workspace `airtable-pilot`, using Airtable record IDs for identity.
+- Airtable schema was re-read before import because a previously observed field ID had changed. Project Lead was plain text in the current schema; only exact, unique matches against People names were linked. Two preflight attempts stopped before writes (stale field ID, then credential newline handling); both were corrected before the successful import.
+- Added `Person.role`, typed `LEADS` and `HAS_SUBTASK` support, and expanded task-context results to include project leads, project members, and subtasks. Updated schema diagrams and data dictionary.
+- Imported the approved snapshot in one transaction: 8 Projects, 40 Tasks (13 selected top-level Tasks plus 27 linked subtask items), and 3 People, plus one Workspace node. Relationship totals: 22 `HAS_TASK`, 27 `HAS_SUBTASK`, 7 `PARTICIPATES_IN`, 8 `LEADS`, and 51 workspace `CONTAINS` edges (115 total relationships).
+- Read-only verification confirmed all imported records are workspace-scoped, Airtable IDs are preserved, no email properties or Documents were imported, reciprocal project/task and team links match, and indexes are online. Task-context checks returned project, lead, member, and subtask context. All 9 constraints and 11 online indexes were retained.
+- `codex-mem-01` remained unchanged at 12 nodes and 24 relationships. No embeddings were created and no hosted embedding request was made. Global Codex MCP configuration remains on `codex-mem-01` / `local-development`; it was not redirected to the pilot.
+- This is a one-time local pilot only. Retention/deletion, actor-level audit, and backup/recovery are unresolved; ongoing sync or broader real-data ingestion is not authorized by this import.
+
+## 2026-09-26 — Add Airtable collaborator aliases and inverse task-project links
+
+- User requested explicit People→Task and Task→Project links, then confirmed that Airtable collaborator names Paulo Rezende and Tamara Braga are aliases for existing People records. Added `Person.aliases` support; mapped Paulo Rezende to PF and Tamara Braga to Tams without creating duplicate people. No collaborator emails or profile URLs were stored.
+- The package already supported `Person -[:ASSIGNED_TO]-> Task`; preserved that direction. Added `Task -[:BELONGS_TO]-> Project` as the explicit inverse of existing `Project -[:HAS_TASK]-> Task`; task-context project lookup now recognizes either orientation.
+- Imported 20 `ASSIGNED_TO` edges, storing the source Airtable collaborator user ID on each edge, and added `BELONGS_TO` for the 22 existing project/task pairs. Read-only verification confirmed the 22 inverse edges exactly match `HAS_TASK`, 20 assignment edges link two existing People to existing Tasks, and two People have aliases.
+- Smoke-tested `get_task_context` against `airtable-pilot`; it returned the task, its two linked projects, and assignees PF and Tams. `git diff --check` and Python byte-compilation passed. No commit or push was requested.
+
+## 2026-09-26 — Make the bundle available across local Codex projects
+
+- User asked to make the Neo4j memory bundle available globally. Installed a user-level symlink at `~/.codex/skills/neo4j-agent-memory` pointing to the repository skill, so its instructions stay in sync with the bundle.
+- Updated the global user-level Codex MCP environment to database `neo4j` / workspace `airtable-pilot` (from the demo target `codex-mem-01` / `local-development`). `codex mcp list` reports the entry enabled. Restart/new Codex session may be required to reload its MCP process and global skill index.
+- This is global only across projects using this local macOS Codex user. Neo4j remains bound to loopback; other computers/cloud environments require a separately secured remote deployment and per-host setup. No network exposure was made.
+
+## 2026-09-30 — Align graph labels and schema with current Airtable
+
+- Refreshed the live six-table Airtable schema; saved field IDs/types/link configurations/select options in `schema/airtable-source-schema.json` and an explicit field/relationship crosswalk in `schema/airtable-mapping.md`. Source record counts for the existing pilot categories are now Team 4, Setores 9, Tasks 16, Subtasks 30.
+- Added Setor, Team, Subtask, Meeting, and Document metadata entity support. Setor/Team/Subtask share legacy Project/Person/Task identity, constraints, and labels. Allowed properties cover current descriptions, updates, Drive links, subtask state/date, and source table provenance. Typed relationships accept new labels while preserving legacy calls; context includes parent tasks and current-vocabulary aliases.
+- Applied `examples/migrate_airtable_schema.py --apply` to `neo4j` / `airtable-pilot`: 8 Setor:Project, 3 Team:Person, 27 Subtask:Task, 13 top-level Tasks. Original properties, aliases, IDs, and all edges were preserved. Four additional constraints were initialized. The graph remains 52 nodes and 157 relationships, with 106 domain relationships. A private pre-migration export was saved under ignored `.migration-backups/`.
+- Preserved the previous task `rec5OGWI2239twajF`, absent from the current source, with source_snapshot_present=false. Nine current source rows were not imported. No content refresh, Meetings/Documents record import, attachment download, or embedding call was performed.
+- Live verification exercised source/legacy upserts, six supported entity categories, duplicate prevention, typed links, and parent/subtask retrieval in a temporary synthetic workspace; cleanup restored the original graph count. The configured MCP launcher initially failed to import its editable package; reinstalling the local package corrected it, then six-tool discovery and a read-only pilot task-context call succeeded.
+
+## 2026-09-30 — Refresh current Airtable source content
+
+- User requested the source content be migrated after the schema alignment. Refetched the full current Airtable snapshot from Team, Setores, Tasks, Subtasks, Meetings, and Documents (70 rows total) and applied it to `neo4j` / `airtable-pilot` in one transaction using `examples/import_airtable_snapshot.py`.
+- Refreshed record properties and source relationships; imported 162 links. Read-only verification confirmed 4 Team, 9 Setores, 16 Tasks, 30 Subtasks, 9 Meetings, and 2 Documents, with the prior absent task retained and flagged false. `codex-mem-01` was not modified.
+- Stored mapped Task/Subtask text, Meeting/Document notes, and structured status/date/link values locally. Attachment metadata includes filenames, sizes, and MIME types only. No attachment bytes, signed attachment URLs, collaborator emails, or profile image URLs were stored; no embeddings or external embedding calls were made.
+- Added a repeatable dry-run-by-default snapshot importer. Before each apply it saves a private pre-write export in ignored `.migration-backups/`. The transient sanitized Airtable input snapshot is removed after verification.
+- The final global MCP handshake exposed an intermittent editable-package import failure from the iCloud checkout. Added the bundle `src` path to the configured server environment as `PYTHONPATH`; the configured launcher then passed six-tool discovery and refreshed task-context retrieval.
+- Corrected the export routine to include the Workspace node and `CONTAINS` edges, and wrote a complete private post-refresh graph export. Restore has not been exercised.

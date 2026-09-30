@@ -12,7 +12,7 @@ from mcp.server.fastmcp import FastMCP
 from .embedding import OpenAIEmbeddingProvider
 from .models import DocumentInput, EntityInput, EntityRef, Scope
 from .service import MemoryService
-from .store import Neo4jStore
+from .store import Neo4jStore, ALLOWED_LABELS
 
 
 def _json_safe(value: Any) -> Any:
@@ -76,9 +76,9 @@ def build_mcp(service: MemoryService) -> FastMCP:
         source_id: str,
         properties: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Create or update a Project, Task, Client, Partner, or Person in the configured workspace."""
-        if entity_type not in {"Project", "Task", "Client", "Partner", "Person"}:
-            raise ValueError("entity_type must be Project, Task, Client, Partner, or Person")
+        """Upsert Setor, Team, Task, Subtask, Meeting, Document metadata, or legacy Project/Person/Client/Partner."""
+        if entity_type not in ALLOWED_LABELS:
+            raise ValueError(f"entity_type must be one of {sorted(ALLOWED_LABELS)}")
         return service.upsert_entity(
             EntityInput(entity_type, entity_id, name, source_system, source_id, properties or {})
         )
@@ -93,7 +93,7 @@ def build_mcp(service: MemoryService) -> FastMCP:
         provenance: str = "USER_LINKED",
         review_state: str = "USER_LINKED",
     ) -> dict[str, str]:
-        """Create an allowlisted typed relationship within the configured workspace."""
+        """Create an allowlisted relationship (including project leadership) in the configured workspace."""
         service.store.link_entities(
             service.scope,
             EntityRef(from_type, from_id),

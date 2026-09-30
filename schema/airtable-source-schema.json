@@ -1,0 +1,751 @@
+{
+  "base_id": "app18Kb5LQUkv8wy2",
+  "observed_on": "2026-09-30",
+  "tables": [
+    {
+      "id": "tbl518pubSWkoEl3i",
+      "name": "Team",
+      "primaryFieldId": "fldRMDPyE7QHmjWo9",
+      "fields": [
+        {
+          "id": "fldRMDPyE7QHmjWo9",
+          "name": "Name",
+          "type": "singleLineText",
+          "config": {}
+        },
+        {
+          "id": "fldl0YMgIT5cRFKH9",
+          "name": "Photo",
+          "type": "multipleAttachments",
+          "description": "Currently empty across all three People records. Exposed read-only on the Management → Team interface; retain unless that interface is intentionally revised and the field is confirmed unnecessary.",
+          "config": {
+            "isReversed": false
+          }
+        },
+        {
+          "id": "fldjX2huPVbZ2oRvI",
+          "name": "Role",
+          "type": "singleSelect",
+          "description": "Represents each person's job role, such as Project manager, Developer, or Product manager. Do not use this field for disciplines such as Engineering, Design, Product, or Research. Current People records use normalized job-role values. Discipline and legacy capitalization choices remain in the select options pending cleanup in Airtable's field editor.",
+          "config": {
+            "choices": [
+              {
+                "id": "selVm6AxrNLl4R2d5",
+                "name": "Engineering",
+                "color": "greenLight2"
+              },
+              {
+                "id": "sel8Nmtf3w52d3TIf",
+                "name": "Design",
+                "color": "orangeLight2"
+              },
+              {
+                "id": "sel1BGQf1Ag28Kw2C",
+                "name": "Product",
+                "color": "pinkLight2"
+              },
+              {
+                "id": "selenXm3MZgz4P7jQ",
+                "name": "Research",
+                "color": "purpleLight2"
+              },
+              {
+                "id": "selAn8sv3McClxAje",
+                "name": "Project-manager",
+                "color": "redLight2"
+              },
+              {
+                "id": "sel3LcnRgodncbDrk",
+                "name": "product-manager",
+                "color": "tealLight2"
+              },
+              {
+                "id": "seltNBswsoONtvmdW",
+                "name": "developer",
+                "color": "cyanLight2"
+              },
+              {
+                "id": "selfFnBinmnn2v5cL",
+                "name": "Project manager",
+                "color": "blueLight2"
+              },
+              {
+                "id": "selQRKASWgdzUIJp3",
+                "name": "Developer",
+                "color": "cyanLight2"
+              },
+              {
+                "id": "selIKCd4yE2oT3Qwh",
+                "name": "Product manager",
+                "color": "tealLight2"
+              },
+              {
+                "id": "selgL9J1fvwNVnZee",
+                "name": "Operations",
+                "color": "yellowLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fldTJU7bSJxQuVZAH",
+          "name": "Slack DM URL (unused)",
+          "type": "url",
+          "description": "Empty for all three People records; retain only if a Slack DM shortcut is implemented.",
+          "config": {}
+        },
+        {
+          "id": "fldiG9aCJ7lsxp5QR",
+          "name": "Setor",
+          "type": "multipleRecordLinks",
+          "description": "Canonical linked-record relationships to Projects.",
+          "config": {
+            "linkedTableId": "tbllwAsdO3INbWG2l",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fld7EZHQ8pJSmvMNz"
+          }
+        },
+        {
+          "id": "fldCCCpIQNzvgTzqt",
+          "name": "Bio",
+          "type": "multilineText",
+          "description": "Currently empty across all three People records. Exposed as editable on the Management → Team interface; retain unless that interface is intentionally revised and the field is confirmed unnecessary.",
+          "config": {}
+        },
+        {
+          "id": "fldCwWmXtV6aWoJbT",
+          "name": "Subtasks",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tblddT9IPVKdUkVQq",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldZ3gZuRCH4SJwp5"
+          }
+        }
+      ],
+      "graph_label": "Team",
+      "existing_pilot_record_ids": [
+        "rec1eISO7QsO6jyP2",
+        "rec9N9ObmBrwAOrbt",
+        "recNsOhN2kUFQWs8e",
+        "receqBIlAU7Pb211Z"
+      ]
+    },
+    {
+      "id": "tbllwAsdO3INbWG2l",
+      "name": "Setores",
+      "primaryFieldId": "fldbjvqzfZI05RnuQ",
+      "fields": [
+        {
+          "id": "fldbjvqzfZI05RnuQ",
+          "name": "Setor",
+          "type": "multilineText",
+          "config": {}
+        },
+        {
+          "id": "fldeCz4wJ2SNMdS55",
+          "name": "Status",
+          "type": "singleSelect",
+          "config": {
+            "choices": [
+              {
+                "id": "sel2vWKzgPOnw3Bco",
+                "name": "In Progress",
+                "color": "blueLight2"
+              },
+              {
+                "id": "selyZWTnDoB2qa50t",
+                "name": "to-do",
+                "color": "cyanLight2"
+              },
+              {
+                "id": "sel9Q9TcGgtPbNe4y",
+                "name": "Planning",
+                "color": "tealLight2"
+              },
+              {
+                "id": "selZcquFF4NZelB15",
+                "name": "In progress",
+                "color": "blueLight2"
+              },
+              {
+                "id": "selNzMDjIv5bxl9a6",
+                "name": "To do",
+                "color": "cyanLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fldv3outpZj1KcKVH",
+          "name": "Lead",
+          "type": "multipleCollaborators",
+          "description": "Original single-select lead name retained for audit after migration to linked People records.",
+          "config": {}
+        },
+        {
+          "id": "fldHGbPRjJsY4eyj1",
+          "name": "Tasks",
+          "type": "multipleRecordLinks",
+          "description": "Canonical linked task relationship for Projects. The former imported text column is retained as Tasks (legacy import).",
+          "config": {
+            "linkedTableId": "tblBrMmI0QdkDj67m",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "flduHsdJeK0DWcCjI"
+          }
+        },
+        {
+          "id": "fldC9a5wRWjkq4BkO",
+          "name": "External Record ID (legacy import)",
+          "type": "multilineText",
+          "description": "Preserved UUID from the external import. Do not use as the canonical Airtable relationship key.",
+          "config": {}
+        },
+        {
+          "id": "fldH8jE5li90U1SJE",
+          "name": "Related Projects (inverse)",
+          "type": "singleLineText",
+          "description": "Inverse side of the Projects self-link. Reciprocal view of the Related Projects relationship; retain paired link semantics.",
+          "config": {}
+        },
+        {
+          "id": "fld7EZHQ8pJSmvMNz",
+          "name": "People",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tbl518pubSWkoEl3i",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldiG9aCJ7lsxp5QR"
+          }
+        },
+        {
+          "id": "fldcMT3FILo2gmUHQ",
+          "name": "Project Lead",
+          "type": "singleLineText",
+          "description": "Canonical linked-record reference to the responsible person in People.",
+          "config": {}
+        },
+        {
+          "id": "fldIdHRKJtwsVsRgE",
+          "name": "Documents",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tbl9HKSo59e6nRC2r",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldstXvYGuaqaBLlz"
+          }
+        },
+        {
+          "id": "fldfZPQj6wksnLtUJ",
+          "name": "Subtasks",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tblddT9IPVKdUkVQq",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldPvqHqTla3Mi36z"
+          }
+        }
+      ],
+      "graph_label": "Setor",
+      "existing_pilot_record_ids": [
+        "rec1Q1IBbbQQFQKkV",
+        "recGFj9tqdfebjEUz",
+        "recXVwd2ulhAyAtsZ",
+        "recccDzfIFwCqX4Aj",
+        "recikxTG7raRhNk8J",
+        "reclNgJY4uvF2zyoA",
+        "recqGXY2wm4rKeDDE",
+        "recuZkZoKXk0adV1C",
+        "recuxHPCG2lNSzlbr"
+      ]
+    },
+    {
+      "id": "tblBrMmI0QdkDj67m",
+      "name": "Tasks",
+      "primaryFieldId": "fldZzUbbaqffvyGRw",
+      "fields": [
+        {
+          "id": "fldZzUbbaqffvyGRw",
+          "name": "Name",
+          "type": "multilineText",
+          "config": {}
+        },
+        {
+          "id": "fldfOSgvD8A58U4tU",
+          "name": "Status",
+          "type": "singleSelect",
+          "config": {
+            "choices": [
+              {
+                "id": "sel9vLZCI7QFhJ83V",
+                "name": "to-do",
+                "color": "cyanLight2"
+              },
+              {
+                "id": "sel1pfz1NQ7OKmRKs",
+                "name": "In progress",
+                "color": "tealLight2"
+              },
+              {
+                "id": "seldgOzZnieueBxxl",
+                "name": "Complete",
+                "color": "blueLight2"
+              },
+              {
+                "id": "selsSyuxySjyKhZnX",
+                "name": "Atrasado",
+                "color": "orangeLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fldVPzpAVGtg4xZ0q",
+          "name": "Responsável",
+          "type": "multipleCollaborators",
+          "config": {}
+        },
+        {
+          "id": "flduHsdJeK0DWcCjI",
+          "name": "Setor",
+          "type": "multipleRecordLinks",
+          "description": "Inverse linked-record relationship to Projects → Tasks. Lists the projects that include this task.",
+          "config": {
+            "linkedTableId": "tbllwAsdO3INbWG2l",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldHGbPRjJsY4eyj1"
+          }
+        },
+        {
+          "id": "fldPTPrcUoe7h6wbP",
+          "name": "Subtasks",
+          "type": "multipleRecordLinks",
+          "description": "Linked checklist items in the Subtasks table.",
+          "config": {
+            "linkedTableId": "tblddT9IPVKdUkVQq",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "flduRj7kXA3hfiHyV"
+          }
+        },
+        {
+          "id": "fldCGKA9gIj5Dro0B",
+          "name": "Arquivos",
+          "type": "multipleAttachments",
+          "description": "Serialized external attachment metadata retained for audit. A URL field now holds the source file link.",
+          "config": {
+            "isReversed": false
+          }
+        },
+        {
+          "id": "fldcu0Nq8cRNVGfs9",
+          "name": "Due date (date)",
+          "type": "date",
+          "config": {
+            "dateFormat": {
+              "name": "local",
+              "format": "l"
+            }
+          }
+        },
+        {
+          "id": "fld5vVb8ZdNtsL4kX",
+          "name": "Task Descrição",
+          "type": "richText",
+          "config": {}
+        },
+        {
+          "id": "fldhTipkbkAF3zCos",
+          "name": "Task Atualizações",
+          "type": "richText",
+          "config": {}
+        },
+        {
+          "id": "fldzEz2EeLKKLMZQr",
+          "name": "Pasta no G-Drive",
+          "type": "url",
+          "config": {}
+        }
+      ],
+      "graph_label": "Task",
+      "existing_pilot_record_ids": [
+        "rec0AYUyLpAq0sXkc",
+        "rec3fblimS2jsEdvx",
+        "rec47LWwHDoBGAklh",
+        "rec9HDgo39m87EtY7",
+        "rec9tMONPgUCYdNvl",
+        "recCpYY8ryWZ7Ko8V",
+        "recFnCl6RmyGNuuZP",
+        "recK4E7Ssl8e7Veo6",
+        "recQdPO8Je1KFOjjd",
+        "recTeCVcElO0FjLxJ",
+        "recXOKrG8nY2IsauD",
+        "recgOh32mfmqkP2lV",
+        "rechMg2bepTZTHSfo",
+        "recnRAlOLS6NpCWiH",
+        "recsu9F3YtHtCUQiR",
+        "recye7tnMs1RweyDq"
+      ]
+    },
+    {
+      "id": "tblddT9IPVKdUkVQq",
+      "name": "Subtasks",
+      "description": "Structured checklist items migrated from serialized JSON in Tasks. Each item links to its parent task and preserves its completion state.",
+      "primaryFieldId": "fldLBDfSCHcY6nQNO",
+      "fields": [
+        {
+          "id": "fldLBDfSCHcY6nQNO",
+          "name": "Subtask",
+          "type": "singleLineText",
+          "config": {}
+        },
+        {
+          "id": "flduRj7kXA3hfiHyV",
+          "name": "Parent Task",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tblBrMmI0QdkDj67m",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldPTPrcUoe7h6wbP"
+          }
+        },
+        {
+          "id": "fldPvqHqTla3Mi36z",
+          "name": "Setor",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tbllwAsdO3INbWG2l",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldfZPQj6wksnLtUJ"
+          }
+        },
+        {
+          "id": "fldpt96OEEnOJXRlL",
+          "name": "Status",
+          "type": "singleSelect",
+          "config": {
+            "choices": [
+              {
+                "id": "selMO8XFxfOEbQ5zZ",
+                "name": "Pendete",
+                "color": "grayLight2"
+              },
+              {
+                "id": "seldW3gV0VGe8LYIf",
+                "name": "Fazendo",
+                "color": "purpleLight2"
+              },
+              {
+                "id": "selw8kzV3nR5dBu8L",
+                "name": "Feito",
+                "color": "greenLight2"
+              },
+              {
+                "id": "selTD2iSdIDGvR9pe",
+                "name": "Bloqueado",
+                "color": "redLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fldZ3gZuRCH4SJwp5",
+          "name": "Assigned",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tbl518pubSWkoEl3i",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldCwWmXtV6aWoJbT"
+          }
+        },
+        {
+          "id": "fldQ5LrehJiEoxFka",
+          "name": "Data",
+          "type": "date",
+          "config": {
+            "dateFormat": {
+              "name": "local",
+              "format": "l"
+            }
+          }
+        },
+        {
+          "id": "fldSHQcPsWoPDX26V",
+          "name": "Complete",
+          "type": "checkbox",
+          "config": {
+            "icon": "check",
+            "color": "greenBright"
+          }
+        },
+        {
+          "id": "fldxAWwC6uEqAsCwX",
+          "name": "Task Descrição",
+          "type": "richText",
+          "config": {}
+        },
+        {
+          "id": "fldh6ItuXeVPo4kGy",
+          "name": "Task Updates",
+          "type": "richText",
+          "config": {}
+        },
+        {
+          "id": "fldj8Iu3pBG8mqpGq",
+          "name": "Source Option ID",
+          "type": "singleLineText",
+          "config": {}
+        },
+        {
+          "id": "fld1F8P7dXH6UKSH4",
+          "name": "Name (from Assigned)",
+          "type": "multipleLookupValues",
+          "config": {
+            "isValid": true,
+            "recordLinkFieldId": "fldZ3gZuRCH4SJwp5",
+            "fieldIdInLinkedTable": "fldRMDPyE7QHmjWo9",
+            "result": {
+              "type": "singleLineText"
+            }
+          }
+        },
+        {
+          "id": "fldRNmjh7vPWBeUR8",
+          "name": "Projeto (from Project)",
+          "type": "multipleLookupValues",
+          "config": {
+            "isValid": true,
+            "recordLinkFieldId": "fldPvqHqTla3Mi36z",
+            "fieldIdInLinkedTable": "fldbjvqzfZI05RnuQ",
+            "result": {
+              "type": "multilineText"
+            }
+          }
+        }
+      ],
+      "graph_label": "Subtask",
+      "existing_pilot_record_ids": [
+        "rec1tlsnpe0ZOpo8w",
+        "rec34xinfHpBHYcwg",
+        "rec4Z3yAI5jh1369c",
+        "rec7i3Pgifg9NJUyD",
+        "rec8Tx66spBMgcHoT",
+        "recBcntdLpF5j59r5",
+        "recFAU6lIexFQBDSN",
+        "recJdocUPcnvap4Ux",
+        "recK8uzARUzDuqvVn",
+        "recPLdOBAVeqYd4n5",
+        "recR20K9WDX6Huhk0",
+        "recVD59B1jm3Vghgi",
+        "recVuUAt8S20BtkSV",
+        "recXSXNn7QOa3LaB3",
+        "recZ7vX9J0PRfciOZ",
+        "recbVrH0m1cKvmLBH",
+        "recd8nNGpO87SCti5",
+        "rechfHPbTHOtYvIqB",
+        "reci1SCj4vsPuHlFw",
+        "recmfsiNRB5kDAM0O",
+        "recnSTFeSdtwCIf07",
+        "recnhmW73wOKHWlmc",
+        "recp2CutnjLAhX0aw",
+        "recqcHUPFKP0G6J8z",
+        "recrz1vz6uLRHp1OC",
+        "rectmrO4GouSfieT4",
+        "recttyzjPAPeBk69p",
+        "recuAAq7aZwUINZky",
+        "recuCV4jsY2iNGWze",
+        "reczcbIFI560t1yVS"
+      ]
+    },
+    {
+      "id": "tblIoJIcbLBQ4DLxO",
+      "name": "Meetings",
+      "primaryFieldId": "fldBivGZcG4gapSYT",
+      "fields": [
+        {
+          "id": "fldBivGZcG4gapSYT",
+          "name": "Title",
+          "type": "singleLineText",
+          "description": "Title of the synced Google Calendar event.",
+          "config": {}
+        },
+        {
+          "id": "fldg2L69SxTO53W3p",
+          "name": "Date",
+          "type": "dateTime",
+          "config": {
+            "dateFormat": {
+              "name": "local",
+              "format": "l"
+            },
+            "timeFormat": {
+              "name": "12hour",
+              "format": "h:mma"
+            },
+            "timeZone": "America/Sao_Paulo"
+          }
+        },
+        {
+          "id": "fldKspMZUEiDdYl5t",
+          "name": "Notes",
+          "type": "multilineText",
+          "config": {}
+        },
+        {
+          "id": "fldUD54hxO7PAbUjr",
+          "name": "Attachments (unused)",
+          "type": "multipleAttachments",
+          "description": "Empty for all six Meetings records; retain only if meeting files will be attached.",
+          "config": {
+            "isReversed": false
+          }
+        },
+        {
+          "id": "fldZ6COXoamnstRqR",
+          "name": "Link",
+          "type": "url",
+          "config": {}
+        },
+        {
+          "id": "fldflaH7xsZoauhAM",
+          "name": "Status",
+          "type": "singleSelect",
+          "config": {
+            "choices": [
+              {
+                "id": "selwOvufjRlIG9qAc",
+                "name": "Todo",
+                "color": "redLight2"
+              },
+              {
+                "id": "sel8WrqpdKcqDMJgL",
+                "name": "In progress",
+                "color": "yellowLight2"
+              },
+              {
+                "id": "selBkLhjlhO4ZwRuB",
+                "name": "Done",
+                "color": "greenLight2"
+              },
+              {
+                "id": "selJJO2JeZ8DgDxew",
+                "name": "To do",
+                "color": "blueLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fld0v9ctvubf7Kn96",
+          "name": "Calendar Event ID",
+          "type": "singleLineText",
+          "description": "Google Calendar event ID used to match later updates and cancellations.",
+          "config": {}
+        },
+        {
+          "id": "fldHJIyPqLh24Swf7",
+          "name": "Calendar Status",
+          "type": "singleLineText",
+          "description": "Status synced from Google Calendar, such as confirmed or cancelled.",
+          "config": {}
+        }
+      ],
+      "graph_label": "Meeting",
+      "existing_pilot_record_ids": []
+    },
+    {
+      "id": "tbl9HKSo59e6nRC2r",
+      "name": "Documents",
+      "primaryFieldId": "fldHkjnZy60RogG3b",
+      "fields": [
+        {
+          "id": "fldHkjnZy60RogG3b",
+          "name": "Name",
+          "type": "singleLineText",
+          "config": {}
+        },
+        {
+          "id": "fldstXvYGuaqaBLlz",
+          "name": "Projects",
+          "type": "multipleRecordLinks",
+          "config": {
+            "linkedTableId": "tbllwAsdO3INbWG2l",
+            "isReversed": false,
+            "prefersSingleRecordLink": false,
+            "inverseLinkFieldId": "fldIdHRKJtwsVsRgE"
+          }
+        },
+        {
+          "id": "fldryUCEyax4CqMfj",
+          "name": "Notes (unused)",
+          "type": "multilineText",
+          "description": "Empty for all three DOCS records; retain only if a notes workflow is defined.",
+          "config": {}
+        },
+        {
+          "id": "fldMNQsDIvJTvrQgG",
+          "name": "Attachments",
+          "type": "multipleAttachments",
+          "config": {
+            "isReversed": false
+          }
+        },
+        {
+          "id": "fldVUWSICMJlgN78M",
+          "name": "Assignee",
+          "type": "multipleCollaborators",
+          "config": {}
+        },
+        {
+          "id": "fldHnCHPVbnaw4ED5",
+          "name": "Status",
+          "type": "singleSelect",
+          "config": {
+            "choices": [
+              {
+                "id": "sel2HLJYDRS0qdKPI",
+                "name": "Todo",
+                "color": "redLight2"
+              },
+              {
+                "id": "selJ9sySquTYgm7rk",
+                "name": "In progress",
+                "color": "yellowLight2"
+              },
+              {
+                "id": "selVsBhWkzNlevG2r",
+                "name": "Done",
+                "color": "greenLight2"
+              }
+            ]
+          }
+        },
+        {
+          "id": "fldpCSq6v3tEbGDjg",
+          "name": "Projeto (from Projects)",
+          "type": "multipleLookupValues",
+          "config": {
+            "isValid": true,
+            "recordLinkFieldId": "fldstXvYGuaqaBLlz",
+            "fieldIdInLinkedTable": "fldbjvqzfZI05RnuQ",
+            "result": {
+              "type": "multilineText"
+            }
+          }
+        }
+      ],
+      "graph_label": "Document",
+      "existing_pilot_record_ids": []
+    }
+  ]
+}

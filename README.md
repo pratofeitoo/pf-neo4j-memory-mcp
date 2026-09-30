@@ -1,8 +1,8 @@
 # Neo4j Agent Memory Package
 
 **Documentation status:** Design and implementation in progress
-**Implementation status:** Codex stdio MCP enabled and handshake/tool lookup verified against local synthetic data; hosted embeddings not verified
-**Last reviewed:** 2026-09-25
+**Implementation status:** Codex stdio MCP enabled and handshake/tool lookup verified against local synthetic data; one-time Airtable pilot imported in `neo4j` / `airtable-pilot`; no hosted embeddings used
+**Last reviewed:** 2026-09-30
 
 This directory is the durable project record for designing and building an agent-memory package around Neo4j. It is both a practical implementation plan and the place to record the decisions, evidence, and changes that explain how the delivered solution was built.
 
@@ -18,7 +18,10 @@ The first implementation should favor a small, coherent core: domain schema, pro
 
 ## Document map
 
+- [Current Airtable mapping](schema/airtable-mapping.md) — source labels, field IDs, compatibility migration, and preserved snapshot boundaries.
+
 - [Codex skill](.agents/skills/neo4j-agent-memory/SKILL.md) — when and how to use the bundled memory tools, with source, authorization, and synthetic-data safeguards.
+- [Real-data pilot readiness](real-data-pilot.md) — target database, observed state, unresolved handling decisions, and pre-ingestion gates.
 - [Architecture and design](architecture.md) — goals, boundaries, proposed components, graph model, retrieval, tools, security, decisions, and open questions.
 - [Step-by-step implementation plan](implementation-plan.md) — ordered phases, deliverables, acceptance criteria, dependencies, and verification gates.
 - [Build record](build-record.md) — append-only evidence of what was implemented, changed, tested, and deferred. Planned work must not be reported as completed here.
@@ -29,7 +32,7 @@ The first implementation should favor a small, coherent core: domain schema, pro
 
 ## Current implementation slice
 
-The `src/neo4j_agent_memory/` package contains a local MCP server, scoped Neo4j store, entity/link operations, plain text and Markdown ingestion, OpenAI embeddings behind a provider interface, indexed semantic chunk retrieval with a workspace prefilter, and structured task context lookup. The project-local Codex skill in `.agents/skills/neo4j-agent-memory/` guides agents using these tools. The server is configured for one local Codex user and one configured workspace. It does not yet provide multi-user authorization, document version history, retention/deletion workflows, source-system synchronization, or production operations.
+The `src/neo4j_agent_memory/` package contains a local MCP server, scoped Neo4j store, typed entity/link operations (including project leadership and subtasks), plain text and Markdown ingestion, OpenAI embeddings behind a provider interface, indexed semantic chunk retrieval with a workspace prefilter, and structured task context lookup including project leads, members, and subtasks. The project-local Codex skill in `.agents/skills/neo4j-agent-memory/` guides agents using these tools. The server is configured for one local Codex user and one configured workspace. It does not yet provide multi-user authorization, document version history, retention/deletion workflows, source-system synchronization, or production operations.
 
 The default embedding model is `text-embedding-3-small` (1536 dimensions). The client is only created when an embedding call is made; initialization and schema creation do not call the embedding provider. Never put an API key in checked-in files. The synthetic demo uses a deterministic feature-hash vector solely to populate and exercise the local retrieval path; its ranking is not a semantic-quality measure and its vectors are tagged with a different model name.
 
@@ -43,7 +46,7 @@ The default embedding model is `text-embedding-3-small` (1536 dimensions). The c
 
 To load the repeatable fictional dataset into `local-development`, run `PYTHONPATH=src python examples/seed_synthetic_demo.py` after dependencies are installed. It uses a local-only deterministic fixture embedder and does not call OpenAI.
 
-The configured Neo4j instance was inventoried read-only as Enterprise `2026.09.0`, with APOC and GDS present and zero graph nodes before setup. Package constraints and indexes were initialized in `codex-mem-01`, which now contains only the cloned fictional demo graph. The local stdio MCP server is enabled in Codex; its initialize/tool-list handshake and read-only synthetic task lookup succeeded. No embedding API request has been made. The local Docker daemon was unavailable during implementation. Retention/privacy policy is explicitly deferred; keep all data synthetic until that work is completed.
+The configured Neo4j instance was inventoried as Enterprise `2026.09.0`, with APOC and GDS present. `codex-mem-01` contains the cloned fictional demo graph. The separate `neo4j` database contains the user-approved Airtable snapshot in workspace `airtable-pilot`; details and limits are in [real-data-pilot.md](real-data-pilot.md). The global Codex stdio MCP entry is configured for `neo4j` / `airtable-pilot`, and the skill is installed in the local user's global Codex skills directory as well as this repository. This makes it available across local projects using this macOS account, not remote/cloud Codex environments. No document embedding request has been made. Retention/privacy policy is not generally defined, so the pilot remains limited to approved structured fields and local use only.
 
 ## Source repositories and technical references
 

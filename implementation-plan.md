@@ -110,7 +110,7 @@ Reference capability matrix and reuse decision record, linked from the architect
 
 ## Phase 4 — Implement the domain persistence service
 
-**Current status:** Initial typed entity upsert and allowlisted typed relationship operations were exercised with the fictional seed graph in Neo4j. Persistence is implemented; broader identity and authorization behavior remains open.
+**Current status:** Typed persistence and workspace scoping are implemented. In addition to the synthetic fixture, the six-table Airtable pilot exercised current labels, mapped fields and links, and a transactional snapshot refresh in `neo4j` / `airtable-pilot`. Broader identity, authorization, retention, and audit behavior remain open.
 
 ### Work
 

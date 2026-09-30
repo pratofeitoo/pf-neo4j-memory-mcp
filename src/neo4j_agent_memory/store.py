@@ -6,21 +6,46 @@ from neo4j import Driver
 
 from .models import DocumentInput, EntityInput, EntityRef, Scope
 
-ALLOWED_LABELS = {"Project", "Task", "Client", "Partner", "Person"}
-ALLOWED_LINK_TYPES = {"Project", "Task", "Client", "Partner", "Person"}
+COMPATIBILITY_LABELS = {"Setor": "Project", "Team": "Person", "Subtask": "Task"}
+ALLOWED_LABELS = {"Project", "Setor", "Task", "Subtask", "Client", "Partner", "Person", "Team", "Meeting", "Document"}
+ALLOWED_LINK_TYPES = ALLOWED_LABELS - {"Document"}
 ALLOWED_PROPERTIES = {
     "Project": {"status", "summary", "start_at", "due_at"},
-    "Task": {"status", "priority", "description", "due_at", "completed_at"},
+    "Task": {"status", "priority", "description", "updates", "drive_folder_url", "due_at", "completed_at", "complete", "date", "source_option_id", "attachment_metadata"},
     "Client": {"external_ref", "website"},
     "Partner": {"external_ref", "website"},
-    "Person": {"external_ref", "email"},
+    "Person": {"external_ref", "email", "role", "aliases", "photo_metadata", "slack_dm_url"},
+    "Meeting": {"date", "notes", "link", "status", "calendar_event_id", "calendar_status", "attachment_urls", "attachment_metadata"},
+    "Document": {"title", "status", "notes", "attachment_urls", "attachment_metadata", "source_uri", "mime_type"},
 }
+ALLOWED_PROPERTIES["Project"] |= {"project_lead_text", "legacy_external_record_id", "related_projects_text"}
+ALLOWED_PROPERTIES["Person"] |= {"bio", "photo_urls", "slack_dm_url"}
+for alias, canonical in COMPATIBILITY_LABELS.items():
+    ALLOWED_PROPERTIES[alias] = ALLOWED_PROPERTIES[canonical]
+SOURCE_PROPERTIES = {"source_base_id", "source_table_id", "source_table_name", "schema_version", "source_snapshot_present"}
+for properties in ALLOWED_PROPERTIES.values():
+    properties.update(SOURCE_PROPERTIES)
 ALLOWED_LINKS = {
     ("Project", "HAS_TASK", "Task"),
+    ("Task", "BELONGS_TO", "Project"),
+    ("Task", "HAS_SUBTASK", "Task"),
     ("Project", "FOR_CLIENT", "Client"),
     ("Project", "WITH_PARTNER", "Partner"),
     ("Person", "ASSIGNED_TO", "Task"),
     ("Person", "PARTICIPATES_IN", "Project"),
+    ("Person", "LEADS", "Project"),
+    ("Project", "HAS_SUBTASK", "Task"),
+    ("Task", "BELONGS_TO", "Task"),
+    ("Project", "HAS_DOCUMENT", "Document"),
+    ("Document", "BELONGS_TO", "Project"),
+    ("Person", "ASSIGNED_TO", "Document"),
+}
+ALLOWED_LINKS |= {
+    (source, relation, target)
+    for source in ALLOWED_LABELS for target in ALLOWED_LABELS
+    for canonical_source, relation, canonical_target in tuple(ALLOWED_LINKS)
+    if COMPATIBILITY_LABELS.get(source, source) == canonical_source
+    and COMPATIBILITY_LABELS.get(target, target) == canonical_target
 }
 ALLOWED_PROVENANCE = {"USER_LINKED", "IMPORTED", "EXTRACTED"}
 ALLOWED_REVIEW_STATES = {"USER_LINKED", "IMPORTED", "PROPOSED", "REVIEWED"}
@@ -44,6 +69,8 @@ class Neo4jStore:
             "CREATE CONSTRAINT document_source_key IF NOT EXISTS FOR (n:Document) REQUIRE (n.workspace_id, n.source_system, n.source_id) IS UNIQUE",
             "CREATE CONSTRAINT chunk_id IF NOT EXISTS FOR (n:DocumentChunk) REQUIRE (n.workspace_id, n.id) IS UNIQUE",
         ]
+        for label in ("Setor", "Team", "Subtask", "Meeting"):
+            statements.append(f"CREATE CONSTRAINT {label.lower()}_id IF NOT EXISTS FOR (n:{label}) REQUIRE (n.workspace_id, n.id) IS UNIQUE")
         # The dimension is validated numeric configuration, embedded as a Cypher literal.
         vector_statement = (
             "CYPHER 25 CREATE VECTOR INDEX memory_chunk_embedding IF NOT EXISTS "
@@ -71,11 +98,13 @@ class Neo4jStore:
         invalid_properties = set(entity.properties) - ALLOWED_PROPERTIES[entity.entity_type]
         if invalid_properties:
             raise ValueError(f"Unsupported {entity.entity_type} properties: {sorted(invalid_properties)}")
+        canonical_label = COMPATIBILITY_LABELS.get(entity.entity_type, entity.entity_type)
         query = f"""
         MERGE (w:Workspace {{id: $workspace_id}})
         ON CREATE SET w.created_at = datetime()
-        MERGE (n:{entity.entity_type} {{workspace_id: $workspace_id, id: $entity_id}})
+        MERGE (n:{canonical_label} {{workspace_id: $workspace_id, id: $entity_id}})
         ON CREATE SET n.created_at = datetime()
+        SET n:{entity.entity_type}
         SET n.name = $name, n.source_system = $source_system,
             n.source_id = $source_id, n.updated_at = datetime(),
             n += $properties
@@ -237,7 +266,7 @@ class Neo4jStore:
         OPTIONAL MATCH (d)-[r:RELATES_TO]->(e)
         RETURN score, c.id AS chunk_id, c.text AS text, c.locator AS locator,
                d.id AS document_id, d.title AS title, d.source_uri AS source_uri,
-               collect(DISTINCT {type: labels(e)[0], id:e.id, name:e.name,
+               collect(DISTINCT {type: CASE WHEN e:Setor THEN 'Setor' WHEN e:Team THEN 'Team' WHEN e:Subtask THEN 'Subtask' ELSE labels(e)[0] END, id:e.id, name:e.name,
                                  provenance:r.provenance, review_state:r.review_state}) AS entities
         ORDER BY score DESC LIMIT $limit
         """
@@ -254,16 +283,32 @@ class Neo4jStore:
     def get_task_context(self, scope: Scope, task_id: str) -> dict[str, Any] | None:
         query = """
         MATCH (t:Task {workspace_id:$workspace_id,id:$task_id})
-        OPTIONAL MATCH (p:Project {workspace_id:$workspace_id})-[:HAS_TASK]->(t)
+        OPTIONAL MATCH (p:Project {workspace_id:$workspace_id})
+        WHERE EXISTS { MATCH (p)-[:HAS_TASK]->(t) }
+           OR EXISTS { MATCH (t)-[:BELONGS_TO]->(p) }
+           OR EXISTS { MATCH (p)-[:HAS_SUBTASK]->(t) }
         OPTIONAL MATCH (person:Person {workspace_id:$workspace_id})-[:ASSIGNED_TO]->(t)
+        OPTIONAL MATCH (project_lead:Person {workspace_id:$workspace_id})-[:LEADS]->(p)
+        OPTIONAL MATCH (project_member:Person {workspace_id:$workspace_id})-[:PARTICIPATES_IN]->(p)
+        OPTIONAL MATCH (t)-[:HAS_SUBTASK]->(subtask:Task {workspace_id:$workspace_id})
+        OPTIONAL MATCH (parent:Task {workspace_id:$workspace_id})-[:HAS_SUBTASK]->(t)
         OPTIONAL MATCH (d:Document {workspace_id:$workspace_id})-[:RELATES_TO]->(t)
         RETURN t {.*, labels: labels(t)} AS task,
                collect(DISTINCT p {.*, labels: labels(p)}) AS projects,
                collect(DISTINCT person {.*, labels: labels(person)}) AS assignees,
+               collect(DISTINCT project_lead {.*, labels: labels(project_lead)}) AS project_leads,
+               collect(DISTINCT project_member {.*, labels: labels(project_member)}) AS project_members,
+               collect(DISTINCT subtask {.*, labels: labels(subtask)}) AS subtasks,
+               collect(DISTINCT parent {.*, labels: labels(parent)}) AS parent_tasks,
                collect(DISTINCT d {.*, labels: labels(d)}) AS documents
         """
         with self.driver.session(database=self.database) as session:
             record = session.run(
                 query, workspace_id=scope.workspace_id, task_id=task_id
             ).single()
-        return dict(record) if record else None
+        if not record:
+            return None
+        result = dict(record)
+        result["setores"] = [p for p in result["projects"] if "Setor" in p["labels"]]
+        result["team_assignees"] = [p for p in result["assignees"] if "Team" in p["labels"]]
+        return result

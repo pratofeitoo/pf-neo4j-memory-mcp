@@ -199,7 +199,7 @@ Do not describe the system as “smooth” or production-ready based on a succes
 
 - **Status:** Accepted by user for the initial slice on 2026-09-25
 - **Decision:** Support Codex first, run locally for one user, target the user's latest Neo4j with APOC and GDS available, receive source details directly from the user as needed, permit hosted embeddings, and begin with mostly text files. Retention/privacy policy is deferred by user direction.
-- **Consequences:** The initial server reads its workspace from trusted process configuration and has no multi-user authentication. The first document parsers are plain text and Markdown. Hosted embedding code is present but is called only when the user configures credentials and invokes ingestion/search. Real data remains out of scope until retention, deletion, and access policy are defined.
+- **Consequences:** The initial server reads its workspace from trusted process configuration and has no multi-user authentication. The first document parsers are plain text and Markdown. Hosted embedding code is present but is called only when the user configures credentials and invokes ingestion/search. A one-time six-table Airtable structured snapshot is authorized in `neo4j` / `airtable-pilot`; see `real-data-pilot.md` for fields and exclusions. Attachments are metadata only; synchronization remains out of scope pending retention, deletion, and access policy.
 
 ### ADR-001 — Build a domain-aware memory layer on Neo4j
 
@@ -236,11 +236,11 @@ Do not describe the system as “smooth” or production-ready based on a succes
 
 ## 11. Remaining decisions before broader or real-data use
 
-1. Retention, deletion, backup, audit, and privacy/compliance requirements remain explicitly deferred. Do not ingest real client, partner, or personal data until these are defined.
+1. Retention, deletion, backup, actor-level audit, and privacy/compliance requirements remain explicitly deferred. The only exception is the exact one-time Airtable pilot documented in `real-data-pilot.md`; do not expand data fields, sources, or ongoing use until requirements are defined.
 2. The user will provide source systems and workflows as needed. Connector direction, source-of-truth rules, conflict handling, and write-back permissions remain unselected.
 3. Hosted embeddings are permitted, but the provider/model choice is not confirmed as a product decision. The optional OpenAI adapter and `text-embedding-3-small` default are implementation defaults only; no hosted request has been made.
 4. Initial content is mostly text files; only plain text and Markdown are implemented. Volumes, languages, update rates, and other formats remain open.
 5. Local Codex is the first client and one configured workspace is the current boundary. The global Codex stdio entry is enabled and its handshake/tool lookup has been verified; shared access, authenticated multi-user identity, and project-level permissions are unsupported.
 6. Document revision history, retention automation, source synchronization, and migration/backup operations are future design gates.
 
-Continue synthetic-only implementation for reversible work. Do not treat these deferred items as approved for production or real-data use.
+Keep the demo and all non-pilot data synthetic. The exact one-time Airtable snapshot in `real-data-pilot.md` is the only real-data exception; do not treat it as approval for production, ongoing synchronization, or broader real-data use while the deferred items remain unresolved.

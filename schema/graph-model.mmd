@@ -1,15 +1,24 @@
 flowchart LR
-  W[Workspace] -->|CONTAINS| P[Project]
+  W[Workspace] -->|CONTAINS| P[Setor / legacy Project]
   W -->|CONTAINS| T[Task]
   W -->|CONTAINS| C[Client]
   W -->|CONTAINS| R[Partner]
-  W -->|CONTAINS| H[Person]
+  W -->|CONTAINS| H[Team / legacy Person]
   W -->|CONTAINS| D[Document]
   P -->|HAS_TASK| T
+  T -->|BELONGS_TO| P
+  T -->|HAS_SUBTASK| S[Subtask / legacy Task]
+  W -->|CONTAINS| S
+  W -->|CONTAINS| M[Meeting]
+  P -->|HAS_SUBTASK| S
+  H -->|ASSIGNED_TO| S
+  P -->|HAS_DOCUMENT| D
+  D -->|BELONGS_TO| P
   P -->|FOR_CLIENT| C
   P -->|WITH_PARTNER| R
   H -->|ASSIGNED_TO| T
   H -->|PARTICIPATES_IN| P
+  H -->|LEADS| P
   D -->|RELATES_TO, provenance + review state| P
   D -->|RELATES_TO, provenance + review state| T
   D -->|RELATES_TO, provenance + review state| C

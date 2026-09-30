@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-EntityType = Literal["Project", "Task", "Client", "Partner", "Person"]
+EntityType = Literal["Project", "Setor", "Task", "Subtask", "Client", "Partner", "Person", "Team", "Meeting", "Document"]
 LinkReviewState = Literal["USER_LINKED", "IMPORTED", "PROPOSED", "REVIEWED"]
 
 
